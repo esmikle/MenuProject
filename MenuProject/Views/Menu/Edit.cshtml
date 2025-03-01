@@ -1,0 +1,37 @@
+﻿@model MenuProject.Models.Dish
+@{
+    ViewData["Title"] = "Edit";
+    IEnumerable<Ingredient> ingredients = ViewData["Ingredients"] as IEnumerable<Ingredient>;
+}
+
+<div class="container">
+    <h3>
+        Create Pizza
+    </h3>
+    <div class="d-flex justify-content-center col-10">
+        <form asp-controller="Menu" asp-action="Create" method="post">
+            <label for="Name" class="form-label">Name:</label>
+            <input style="width:70%;" asp-for="Name" class="formcontrol" /><br />
+            <label for="ImgUrl" class="form-label">Image Url:</label>
+            <input style="width:70%;" asp-for="ImageUrl" class="formcontrol" /><br />
+            <label for="Price" class="form-label">Price:</label>
+            <input style="width:70%;" asp-for="Price" class="formcontrol" /><br />
+            <div class="d-flex justify-content-center">
+                Ingredients:
+                <br />
+                <ul style="list-style-type: none;">
+                    @foreach (var ing in ingredients)
+                        {
+                        <li>
+                            <input type="checkbox" @if (Model.DishIngredients.Exists(i=>i.Ingredient==ing)){ <text>checked="checked"</text> } name="ingList"  value="@ing.Id" />
+                            <label for="@ing.Name">@ing.Name</label>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <br />
+            <button class="btn btn-primary" type="submit">Update</button>
+        </form>
+    </div>
+</div>
+

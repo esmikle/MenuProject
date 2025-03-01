@@ -1,0 +1,31 @@
+﻿@model List<MenuProject.Models.Ingredient>
+@{
+    ViewData["Title"] = "Ingredient Index";
+}
+
+<div class="container justify-content-center col-6">
+    <table class="table">
+        <tr>
+            <th>
+                Id
+            </th>
+            <th>
+                Name
+            </th>
+        </tr>
+        @foreach (var ing in Model)
+        {
+            <tr>
+                <td class="">
+                    @ing.Id
+                </td>
+                <td class="">
+                    @ing.Name
+                </td>
+            </tr>
+        }
+    </table>
+    <div class="d-flex justify-content-center">
+        <a class="btn btn-info" asp-controller="Ingredient" asp-action="Create" >Create New Ingredient</a>
+    </div>
+</div>
