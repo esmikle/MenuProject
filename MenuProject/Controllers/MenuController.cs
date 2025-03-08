@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using MenuProject.Data;
 using MenuProject.Models;
+using System.Net.NetworkInformation;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -109,6 +110,60 @@ namespace MenuProject.Controllers
                 .FirstOrDefaultAsync(d => d.Id == id);
 
             ViewData["Ingredients"] = await _context.Ingredients.ToListAsync();
+            return View(dish);
+        }
+
+        // POST: /<controller>/edit
+        [HttpPost]
+        public async Task<IActionResult> Edit([Bind("Id,Name,ImageUrl,Price")] Dish dish, List<int> ingList)
+        {
+            if (dish.Name == null)
+            {
+                ModelState.AddModelError("Name", "Name cannot be null");
+            }
+
+            if (ingList.Count <= 0)
+            {
+                ModelState.AddModelError("Ingredients", "Ingredients should be greater than 0");
+            }
+
+            if (ModelState.IsValid)
+            {
+                _context.Dishes.Update(dish);
+                _context.SaveChanges();
+                TempData["success"] = "Dish updated successfully";
+
+                var dishIngredients = await _context.DishIngredients.Where(ing => ing.DishId == dish.Id).ToListAsync();
+
+                foreach (int id in ingList)
+                {
+                    if (!(dishIngredients.Exists(i => i.IngredientId == id)))
+                    {
+                        DishIngredient dsh = new DishIngredient();
+                        dsh.DishId = dish.Id;
+                        dsh.IngredientId = id;
+                        //dish.DishIngredients.Add(dsh);
+
+                        _context.DishIngredients.Add(dsh); //Add new dish ingredients
+                        _context.SaveChanges();
+                    }
+                }
+
+                foreach (DishIngredient dsh in dishIngredients)
+                {
+                    if (!(ingList.Exists(i => i==dsh.IngredientId)))
+                    {
+                        var remDsh = _context.DishIngredients.First(d => d.Equals(dsh));
+
+                        _context.DishIngredients.Remove(remDsh); // Remove dish ingredients
+                        _context.SaveChanges();
+                    }
+                }
+
+                TempData["success"] = "Dish Ingredients updated successfully";
+                return RedirectToAction("Index");
+            }
+
             return View(dish);
         }
     }
